@@ -22,27 +22,23 @@ const icons = {
   'google.com': '<circle cx="11" cy="11" r="7"/><path d="m17 17 4 4"/>'
 };
 const svg = paths => `<svg viewBox="0 0 24 24" aria-hidden="true">${paths}</svg>`;
-let themeTransition;
-let themeRevision = 0;
+let themeFade;
+let themeSave = Promise.resolve();
 
-function applyTheme(theme, remember = false) {
+function applyTheme(theme, remember = false, animate = !remember) {
   const next = themes.includes(theme) ? theme : defaults.theme;
-  const ticket = ++themeRevision;
-  themeTransition?.skipTransition();
-  const update = () => { if (ticket === themeRevision) document.documentElement.dataset.theme = next; };
+  const previous = getComputedStyle(document.body).backgroundColor;
+  const changed = document.documentElement.dataset.theme !== next;
+  themeFade?.cancel();
+  document.documentElement.dataset.theme = next;
   if (remember) {
     try { localStorage.setItem('daymark-start-theme', next); }
     catch { /* The main settings store still retains the selected theme. */ }
   }
-  if (remember || document.documentElement.dataset.theme === next || !document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    update(); return;
+  if (animate && changed && document.body.animate && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.body.style.setProperty('--theme-from', previous);
+    themeFade = document.body.animate([{ opacity: 1 }, { opacity: 0 }], { pseudoElement: '::before', duration: 320, easing: 'cubic-bezier(.22,1,.36,1)' });
   }
-  const transition = document.startViewTransition(update);
-  themeTransition = transition;
-  // Rapid selections intentionally skip the previous snapshot animation.
-  transition.ready.catch(() => {});
-  const clear = () => { if (themeTransition === transition) themeTransition = null; };
-  transition.finished.then(clear, clear);
 }
 
 function renderLinks() {
@@ -161,9 +157,14 @@ function openSettings() {
 }
 $('settings-open').addEventListener('click', openSettings);
 $('settings-close').addEventListener('click', () => $('settings').close());
-$('settings').addEventListener('close', () => applyTheme(settings.theme));
 $('settings-form').addEventListener('change', event => {
-  if (event.target.name === 'theme') applyTheme(event.target.value);
+  if (event.target.name !== 'theme') return;
+  const theme = event.target.value;
+  settings.theme = theme;
+  applyTheme(theme, true, true);
+  themeSave = themeSave.then(async () => {
+    if (extension) await chrome.storage.local.set({ theme });
+  }).catch(() => { $('settings-error').textContent = '配色暂时无法保存，请重新选择后重试。'; });
 });
 $('settings-form').addEventListener('submit', async event => {
   event.preventDefault();
@@ -185,7 +186,7 @@ $('settings-form').addEventListener('submit', async event => {
       if (!granted) throw new Error('未获得 DayMark 站点访问权限，设置尚未保存。');
     }
     const next = { theme: document.querySelector('input[name="theme"]:checked').value, engine: $('engine').value, daymarkUrl: origin, links, demo, showNews: $('show-news').checked };
-    if (extension) await chrome.storage.local.set({ settings: next });
+    if (extension) { await themeSave; await chrome.storage.local.set({ settings: next, theme: next.theme }); }
     else localStorage.setItem('daymark-start-settings', JSON.stringify(next));
     settings = next; revision++; applyTheme(settings.theme, true); $('settings').close(); renderLinks();
     await Promise.all([readDaymark(), readNews()]);
@@ -203,8 +204,8 @@ document.addEventListener('keydown', event => {
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { updateClock(); readDaymark(); readNews(); } });
 async function initialize() {
   try {
-    const stored = extension ? (await chrome.storage.local.get('settings')).settings : JSON.parse(localStorage.getItem('daymark-start-settings'));
-    settings = { ...defaults, ...stored };
+    const stored = extension ? await chrome.storage.local.get(['settings', 'theme']) : { settings: JSON.parse(localStorage.getItem('daymark-start-settings')), theme: localStorage.getItem('daymark-start-theme') };
+    settings = { ...defaults, ...stored.settings, theme: stored.theme || stored.settings?.theme || defaults.theme };
   } catch { settings = { ...defaults }; }
   if (!themes.includes(settings.theme)) settings.theme = defaults.theme;
   applyTheme(settings.theme, true);
