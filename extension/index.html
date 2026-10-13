@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Daymark Start</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <main class="home">
+    <header class="clock">
+      <time id="time" aria-label="当前时间">--:--</time>
+      <p id="date">正在读取日期</p>
+    </header>
+    <form id="search" class="search" role="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+      <input id="query" type="search" aria-label="搜索内容或网址" placeholder="搜索，或输入网址" autocomplete="off" maxlength="2000">
+      <button type="submit" aria-label="开始搜索" title="开始搜索"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></button>
+    </form>
+    <nav id="shortcuts" class="shortcuts" aria-label="常用网址"></nav>
+    <section class="focus" aria-labelledby="focus-label">
+      <div class="section-head"><span id="focus-label"><i class="dot"></i>DAYMARK <span id="focus-state">未连接</span></span><a id="daymark-open" href="#" hidden>打开 DayMark <span aria-hidden="true">↗</span></a></div>
+      <div class="focus-line"><span id="focus-type" class="focus-type">现在</span><p id="focus-title">连接 DayMark，让下一步更清楚。</p><span id="focus-time"></span></div>
+      <p id="focus-next" class="focus-next">在右下角设置中填写你的 DayMark 地址。</p>
+    </section>
+    <section id="news" class="news" aria-labelledby="news-label">
+      <div class="section-head"><span id="news-label">AI 热点 <span id="news-state">读取中</span></span><a href="https://aihot.news/hot" id="news-more">AIHOT <span aria-hidden="true">↗</span></a></div>
+      <ol id="headlines"></ol>
+      <p id="news-error" class="note" role="status"></p>
+      <a id="news-help" class="note" href="https://aihot.news/agent?tab=api#agent-api-recovery" hidden>查看 AIHOT 接入说明 ↗</a>
+    </section>
+  </main>
+  <button id="settings-open" class="settings-button" aria-label="打开设置" title="设置"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="17" r="2"/></svg></button>
+  <dialog id="settings">
+    <form id="settings-form">
+      <div class="dialog-head"><h1>让首页适合你</h1><button type="button" id="settings-close" class="quiet" aria-label="关闭设置">×</button></div>
+      <label>搜索引擎<select id="engine"><option value="bing">Bing</option><option value="google">Google</option><option value="baidu">百度</option></select></label>
+      <label>DayMark 地址<input id="daymark-url" type="url" placeholder="http://127.0.0.1:3000"></label>
+      <p class="note">填 DayMark 网页地址，仅申请访问这个站点。云端先在 DayMark 网页登录；读取失败时会提示。此版本只读取任务。</p>
+      <label class="check"><input id="demo" type="checkbox">展示 DayMark 示例，预览栏目效果</label>
+      <label class="check"><input id="show-news" type="checkbox">显示 AIHOT 热点（每 5 分钟刷新）</label>
+      <label>常用网址<textarea id="links" rows="7" spellcheck="false" placeholder="GitHub | https://github.com"></textarea></label>
+      <p class="note">每行：名称 | 完整网址。最多 8 个；网址图标离线绘制，自定义网址用首字母。</p>
+      <p id="settings-error" class="error" role="alert"></p>
+      <button class="save" type="submit">保存设置</button>
+    </form>
+  </dialog>
+</body>
+</html>
