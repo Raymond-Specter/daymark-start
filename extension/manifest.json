@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Daymark Start",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "黑色极简新标签页：时间、搜索、常用网址、DayMark 当前任务与 AIHOT 热点。",
   "chrome_url_overrides": { "newtab": "index.html" },
   "background": { "service_worker": "background.js", "type": "module" },

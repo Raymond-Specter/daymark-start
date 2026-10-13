@@ -22,13 +22,27 @@ const icons = {
   'google.com': '<circle cx="11" cy="11" r="7"/><path d="m17 17 4 4"/>'
 };
 const svg = paths => `<svg viewBox="0 0 24 24" aria-hidden="true">${paths}</svg>`;
+let themeTransition;
+let themeRevision = 0;
 
 function applyTheme(theme, remember = false) {
-  document.documentElement.dataset.theme = themes.includes(theme) ? theme : defaults.theme;
+  const next = themes.includes(theme) ? theme : defaults.theme;
+  const ticket = ++themeRevision;
+  themeTransition?.skipTransition();
+  const update = () => { if (ticket === themeRevision) document.documentElement.dataset.theme = next; };
   if (remember) {
-    try { localStorage.setItem('daymark-start-theme', document.documentElement.dataset.theme); }
+    try { localStorage.setItem('daymark-start-theme', next); }
     catch { /* The main settings store still retains the selected theme. */ }
   }
+  if (remember || document.documentElement.dataset.theme === next || !document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    update(); return;
+  }
+  const transition = document.startViewTransition(update);
+  themeTransition = transition;
+  // Rapid selections intentionally skip the previous snapshot animation.
+  transition.ready.catch(() => {});
+  const clear = () => { if (themeTransition === transition) themeTransition = null; };
+  transition.finished.then(clear, clear);
 }
 
 function renderLinks() {
