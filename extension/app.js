@@ -47,7 +47,8 @@ function updateClock() {
   const now = new Date();
   $('time').textContent = clockParts(now).time;
   $('time').dateTime = now.toISOString();
-  $('date').textContent = new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Shanghai', month: 'long', day: 'numeric', weekday: 'long' }).format(now);
+  const dateParts = new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Shanghai', month: 'long', day: 'numeric', weekday: 'long' }).formatToParts(now);
+  $('date').textContent = dateParts.filter(part => part.type !== 'weekday').map(part => part.value).join('') + ' · ' + dateParts.find(part => part.type === 'weekday').value;
   if (daymarkData) renderFocus();
 }
 
