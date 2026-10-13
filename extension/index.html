@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="dark">
+  <meta name="color-scheme" content="dark light">
   <title>Daymark Start</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="theme-init.js"></script>
   <script type="module" src="app.js"></script>
 </head>
 <body>
@@ -36,6 +37,17 @@
   <dialog id="settings">
     <form id="settings-form">
       <div class="dialog-head"><h1>让首页适合你</h1><button type="button" id="settings-close" class="quiet" aria-label="关闭设置">×</button></div>
+      <fieldset class="theme-picker">
+        <legend>配色方案</legend>
+        <div class="themes">
+          <label class="theme-option"><input type="radio" name="theme" value="midnight" checked><span class="theme-swatch" data-theme="midnight" aria-hidden="true"></span><span>午夜黑</span></label>
+          <label class="theme-option"><input type="radio" name="theme" value="paper"><span class="theme-swatch" data-theme="paper" aria-hidden="true"></span><span>纸白</span></label>
+          <label class="theme-option"><input type="radio" name="theme" value="navy"><span class="theme-swatch" data-theme="navy" aria-hidden="true"></span><span>海军蓝</span></label>
+          <label class="theme-option"><input type="radio" name="theme" value="forest"><span class="theme-swatch" data-theme="forest" aria-hidden="true"></span><span>森林绿</span></label>
+          <label class="theme-option"><input type="radio" name="theme" value="coffee"><span class="theme-swatch" data-theme="coffee" aria-hidden="true"></span><span>暖咖棕</span></label>
+        </div>
+        <p class="note">点选即可预览，保存后记住配色。</p>
+      </fieldset>
       <label>搜索引擎<select id="engine"><option value="bing">Bing</option><option value="google">Google</option><option value="baidu">百度</option></select></label>
       <label>DayMark 地址<input id="daymark-url" type="url" placeholder="http://127.0.0.1:3000"></label>
       <p class="note">填 DayMark 网页地址，仅申请访问这个站点。云端先在 DayMark 网页登录；读取失败时会提示。此版本只读取任务。</p>

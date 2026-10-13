@@ -2,7 +2,8 @@ import { webUrl, daymarkOrigin, searchTarget, clockParts, selectFocus } from './
 
 const $ = id => document.getElementById(id);
 const extension = !!globalThis.chrome?.runtime?.id;
-const defaults = { engine: 'bing', daymarkUrl: '', demo: false, showNews: true, links: [
+const themes = ['midnight', 'paper', 'navy', 'forest', 'coffee'];
+const defaults = { theme: 'midnight', engine: 'bing', daymarkUrl: '', demo: false, showNews: true, links: [
   { name: 'Google', url: 'https://www.google.com' }, { name: 'GitHub', url: 'https://github.com' },
   { name: 'ChatGPT', url: 'https://chatgpt.com' }, { name: 'Notion', url: 'https://www.notion.so' },
   { name: '哔哩哔哩', url: 'https://www.bilibili.com' }, { name: 'YouTube', url: 'https://www.youtube.com' },
@@ -21,6 +22,14 @@ const icons = {
   'google.com': '<circle cx="11" cy="11" r="7"/><path d="m17 17 4 4"/>'
 };
 const svg = paths => `<svg viewBox="0 0 24 24" aria-hidden="true">${paths}</svg>`;
+
+function applyTheme(theme, remember = false) {
+  document.documentElement.dataset.theme = themes.includes(theme) ? theme : defaults.theme;
+  if (remember) {
+    try { localStorage.setItem('daymark-start-theme', document.documentElement.dataset.theme); }
+    catch { /* The main settings store still retains the selected theme. */ }
+  }
+}
 
 function renderLinks() {
   $('shortcuts').replaceChildren();
@@ -130,6 +139,7 @@ async function readNews() {
 }
 
 function openSettings() {
+  document.querySelectorAll('input[name="theme"]').forEach(input => { input.checked = input.value === settings.theme; });
   $('engine').value = settings.engine; $('daymark-url').value = settings.daymarkUrl;
   $('demo').checked = settings.demo; $('show-news').checked = settings.showNews;
   $('links').value = settings.links.map(link => `${link.name} | ${link.url}`).join('\n');
@@ -137,6 +147,10 @@ function openSettings() {
 }
 $('settings-open').addEventListener('click', openSettings);
 $('settings-close').addEventListener('click', () => $('settings').close());
+$('settings').addEventListener('close', () => applyTheme(settings.theme));
+$('settings-form').addEventListener('change', event => {
+  if (event.target.name === 'theme') applyTheme(event.target.value);
+});
 $('settings-form').addEventListener('submit', async event => {
   event.preventDefault();
   try {
@@ -156,10 +170,10 @@ $('settings-form').addEventListener('submit', async event => {
       const granted = await chrome.permissions.request({ origins: [`${parsed.protocol}//${parsed.hostname}/*`] });
       if (!granted) throw new Error('未获得 DayMark 站点访问权限，设置尚未保存。');
     }
-    const next = { engine: $('engine').value, daymarkUrl: origin, links, demo, showNews: $('show-news').checked };
+    const next = { theme: document.querySelector('input[name="theme"]:checked').value, engine: $('engine').value, daymarkUrl: origin, links, demo, showNews: $('show-news').checked };
     if (extension) await chrome.storage.local.set({ settings: next });
     else localStorage.setItem('daymark-start-settings', JSON.stringify(next));
-    settings = next; revision++; $('settings').close(); renderLinks();
+    settings = next; revision++; applyTheme(settings.theme, true); $('settings').close(); renderLinks();
     await Promise.all([readDaymark(), readNews()]);
   } catch (error) { $('settings-error').textContent = error.message; }
 });
@@ -178,6 +192,8 @@ async function initialize() {
     const stored = extension ? (await chrome.storage.local.get('settings')).settings : JSON.parse(localStorage.getItem('daymark-start-settings'));
     settings = { ...defaults, ...stored };
   } catch { settings = { ...defaults }; }
+  if (!themes.includes(settings.theme)) settings.theme = defaults.theme;
+  applyTheme(settings.theme, true);
   if (!extension && new URLSearchParams(location.search).has('demo')) settings.demo = true;
   renderLinks(); updateClock(); await Promise.all([readDaymark(), readNews()]);
   setInterval(updateClock, 1000);
