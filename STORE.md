@@ -1,4 +1,4 @@
-# 商店发布材料 · 0.1.5
+# 商店发布材料 · 0.1.6
 
 状态：已提供可安装的 Manifest V3 ZIP、扩展图标、隐私说明和以下文案；**尚未提交商店审核，尚无商店下载链接**。
 
@@ -18,6 +18,7 @@ Daymark Start 用简洁的排版，把每天常用的入口放在一起：
 
 - 时间与日期，搜索框，以及最多八个图标网址。
 - 午夜黑、纸白、海军蓝、森林绿、暖咖棕五款配色，点选后自动保存。
+- 随配色变化的微光背景、静态细颗粒和轻磨砂卡片，保留简洁布局。
 - 可选连接自己的 DayMark，显示现在该做什么与下一项安排；本版仅支持读取任务。
 - 可关闭的 AIHOT 前三条热点，正常可见时最低每五分钟更新，异常时显示缓存或失败提示。
 - 轻量悬停、聚焦与按压反馈，尊重系统的减少动态效果设置。
@@ -56,7 +57,7 @@ npm.cmd test
 powershell -NoProfile -File tools/Package.ps1
 ```
 
-输出 `artifacts/daymark-start-0.1.5.zip`、对应 `.sha256` 和方便分发的 `artifacts/daymark-start.zip`。ZIP 根目录包含 `manifest.json`，不包含源码测试、商店材料和本机调试配置。Windows 内置 PowerShell 即可打包，无需安装生产依赖。重新生成图标时运行 `powershell -NoProfile -File tools/New-Icons.ps1`。
+输出 `artifacts/daymark-start-0.1.6.zip`、对应 `.sha256` 和方便分发的 `artifacts/daymark-start.zip`。ZIP 根目录包含 `manifest.json`，不包含源码测试、商店材料和本机调试配置。Windows 内置 PowerShell 即可打包，无需安装生产依赖。重新生成图标时运行 `powershell -NoProfile -File tools/New-Icons.ps1`。
 
 体验版用户解压 ZIP 后，在 `edge://extensions` 或 `chrome://extensions` 开启开发人员模式，加载包含 `manifest.json` 的目录。不要直接加载 ZIP。已有源码版用户可以在扩展管理页重新加载 `extension` 目录。
 

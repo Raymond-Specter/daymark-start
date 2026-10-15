@@ -1,6 +1,6 @@
 # Daymark Start 隐私说明
 
-生效日期：2026-10-15。适用于 0.1.5 版本。
+生效日期：2026-10-15。适用于 0.1.5–0.1.6 版本。
 
 Daymark Start 由 GitHub 用户 [Raymond-Specter](https://github.com/Raymond-Specter) 维护，是替换浏览器新标签页的扩展。开发者没有运营接收用户数据的后台；扩展不包含统计、广告、追踪或远程执行代码。
 
