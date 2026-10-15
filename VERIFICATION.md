@@ -39,3 +39,12 @@
 - 恢复系统默认鼠标并删除两项自定义 SVG 指针；搜索悬停/聚焦、DayMark 浮起与描边、热点标题滑动/箭头/按压均通过浏览器检查。减少动态效果和窄屏无溢出检查通过。
 - 在用户当前的 Codex 内置浏览器预览中复测，发现整页快照过渡会影响紧接着的关闭点击，已替换为轻量背景淡化。纸白和午夜黑均可在换色后立即关闭设置，整页颜色保留；测试后恢复原来的午夜黑。
 - `npm test` 的 12 项测试、`node --check extension/app.js` 和 diff 空白检查通过。此前 0.1.2 的取消试色行为与 0.1.3 的圆形指针、快照过渡均已被本版行为取代。
+
+## 插件分发准备 · 0.1.5 · 2026-10-15
+
+- 新增本地生成的 16/32/48/128px PNG 图标及 Manifest 声明，目视检查 128px 图标；未增加权限或生产依赖。
+- 在 Windows 内置 PowerShell 下运行 `tools/New-Icons.ps1` 与 `tools/Package.ps1` 成功。打包脚本显式使用 UTF-8 读取含中文的 Manifest，生成版本化 ZIP、兼容文件名 ZIP 和 SHA256。
+- ZIP 根目录存在 `manifest.json`；检查全部条目的 CRC，版本为 0.1.5，包中条目恰好等于 `extension` 目录的文件集合，无测试、开发脚本、商店文案和调试配置。
+- 将实际输出 ZIP 解压至隔离目录，在本机 Edge 临时配置中加载。Manifest V3 后台启动成功；导航真实 `chrome://newtab/` 后确认运行扩展 ID、时钟与示例任务，四个声明图标均可解码且尺寸正确，无页面 JavaScript 错误。测试关闭新闻请求，未再次验证 AIHOT 或真实 DayMark。
+- `npm test` 的 12 项测试、`node --check extension/app.js`、`node --check extension/background.js` 与 diff 空白检查通过。
+- 隐私说明和商店文案已按现有代码的数据流编写；开发者账号、商店截图/推广图、真实服务登录验证及正式审核尚未完成。此记录不代表商店批准。

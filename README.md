@@ -4,12 +4,14 @@
 
 ## 安装（Edge / Chrome）
 
-1. 下载源码并解压。
+1. 从 [GitHub Releases](https://github.com/Raymond-Specter/daymark-start/releases/latest) 下载 `daymark-start-版本号.zip` 插件包并解压，或下载源码。
 2. 打开 `edge://extensions` 或 `chrome://extensions`，启用「开发人员模式」。
-3. 点击「加载解压缩的扩展」，选择本项目的 **extension** 文件夹。
+3. 点击「加载解压缩的扩展」。源码选择 **extension** 文件夹；独立插件包选择解压后直接包含 **manifest.json** 的目录（不能直接选择 ZIP）。
 4. 打开新标签页。如果浏览器询问是否保留新标签页更改，选择保留。
 
 这是 Manifest V3 插件，无构建步骤，无生产依赖。GitHub 源码发布不等于扩展商店上架；尚未上架商店。
+
+Windows 下运行 `powershell -NoProfile -File tools/Package.ps1`，会生成版本化 ZIP、SHA256 校验文件和 `artifacts/daymark-start.zip`，可用于本地安装及商店上传。正式上架的账号、文案、权限说明、素材和审核步骤见 [STORE.md](STORE.md)。数据处理方式见 [隐私说明](PRIVACY.md)。
 
 ## 配色方案
 
