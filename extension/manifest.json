@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Daymark Start",
-  "version": "0.1.6",
-  "description": "极简新标签页：五款经典配色、时间、搜索、常用网址、DayMark 当前任务与 AIHOT 热点。",
+  "version": "0.1.7",
+  "description": "极简新标签页：五款经典配色、翻页番茄钟、时间、搜索、常用网址、DayMark 当前任务与 AIHOT 热点。",
   "homepage_url": "https://github.com/Raymond-Specter/daymark-start",
   "icons": { "16": "icons/icon-16.png", "32": "icons/icon-32.png", "48": "icons/icon-48.png", "128": "icons/icon-128.png" },
   "chrome_url_overrides": { "newtab": "index.html" },

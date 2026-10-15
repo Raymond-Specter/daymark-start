@@ -13,7 +13,7 @@
   <div class="atmosphere" aria-hidden="true"></div>
   <main class="home">
     <header class="clock">
-      <time id="time" aria-label="当前时间">--:--</time>
+      <button id="pomodoro-open" class="clock-entry" type="button" aria-label="进入番茄钟" title="点击开始专注"><time id="time" aria-label="当前时间">--:--</time><span class="clock-hint" aria-hidden="true">点击开始专注</span></button>
       <p id="date">正在读取日期</p>
     </header>
     <form id="search" class="search" role="search">
@@ -50,6 +50,8 @@
         <p class="note">点选即应用到整个首页，自动记住配色。</p>
       </fieldset>
       <label>搜索引擎<select id="engine"><option value="bing">Bing</option><option value="google">Google</option><option value="baidu">百度</option></select></label>
+      <label>番茄钟默认时长（分钟）<input id="pomodoro-minutes" type="number" min="1" max="99" step="1" value="25" required></label>
+      <p class="note">1–99 分钟。点击首页时间直接开始；空格暂停或继续，Esc 返回并暂停。</p>
       <label>DayMark 地址<input id="daymark-url" type="url" placeholder="http://127.0.0.1:3000"></label>
       <p class="note">填 DayMark 网页地址，仅申请访问这个站点。云端先在 DayMark 网页登录；读取失败时会提示。此版本只读取任务。</p>
       <label class="check"><input id="demo" type="checkbox">展示 DayMark 示例，预览栏目效果</label>
@@ -59,6 +61,21 @@
       <p id="settings-error" class="error" role="alert"></p>
       <button class="save" type="submit">保存设置</button>
     </form>
+  </dialog>
+  <dialog id="pomodoro" class="pomodoro" aria-label="番茄钟">
+    <div id="flip-clock" class="flip-clock" role="timer" aria-live="off" aria-label="剩余25分0秒" tabindex="-1">
+      <span class="flip-digit" aria-hidden="true"></span><span class="flip-digit" aria-hidden="true"></span>
+      <span class="flip-colon" aria-hidden="true"><i></i><i></i></span>
+      <span class="flip-digit" aria-hidden="true"></span><span class="flip-digit" aria-hidden="true"></span>
+    </div>
+    <div class="pomodoro-controls">
+      <div class="pomodoro-actions">
+        <button id="pomodoro-toggle" type="button" aria-label="暂停" title="暂停（空格）"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg></button>
+        <button id="pomodoro-close" type="button" aria-label="返回首页并暂停" title="返回首页（Esc）"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6M8 12h12"/></svg></button>
+      </div>
+      <p>空格 暂停 / 继续<span>Esc 返回</span></p>
+    </div>
+    <span id="pomodoro-status" class="sr-only" role="status"></span>
   </dialog>
 </body>
 </html>

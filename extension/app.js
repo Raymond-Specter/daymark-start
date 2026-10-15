@@ -1,9 +1,11 @@
 import { webUrl, daymarkOrigin, searchTarget, clockParts, selectFocus } from './core.js';
+import { setupPomodoro } from './pomodoro.js';
+import { parseDuration } from './pomodoro-state.js';
 
 const $ = id => document.getElementById(id);
 const extension = !!globalThis.chrome?.runtime?.id;
 const themes = ['midnight', 'paper', 'navy', 'forest', 'coffee'];
-const defaults = { theme: 'midnight', engine: 'bing', daymarkUrl: '', demo: false, showNews: true, links: [
+const defaults = { theme: 'midnight', engine: 'bing', pomodoroMinutes: 25, daymarkUrl: '', demo: false, showNews: true, links: [
   { name: 'Google', url: 'https://www.google.com' }, { name: 'GitHub', url: 'https://github.com' },
   { name: 'ChatGPT', url: 'https://chatgpt.com' }, { name: 'Notion', url: 'https://www.notion.so' },
   { name: '哔哩哔哩', url: 'https://www.bilibili.com' }, { name: 'YouTube', url: 'https://www.youtube.com' },
@@ -151,6 +153,7 @@ async function readNews() {
 function openSettings() {
   document.querySelectorAll('input[name="theme"]').forEach(input => { input.checked = input.value === settings.theme; });
   $('engine').value = settings.engine; $('daymark-url').value = settings.daymarkUrl;
+  $('pomodoro-minutes').value = settings.pomodoroMinutes;
   $('demo').checked = settings.demo; $('show-news').checked = settings.showNews;
   $('links').value = settings.links.map(link => `${link.name} | ${link.url}`).join('\n');
   $('settings-error').textContent = ''; $('settings').showModal();
@@ -180,12 +183,13 @@ $('settings-form').addEventListener('submit', async event => {
     });
     if (links.length > 8) throw new Error('最多保留 8 个常用网址。');
     const demo = $('demo').checked;
+    const pomodoroMinutes = parseDuration($('pomodoro-minutes').value);
     if (extension && origin && !demo) {
       const parsed = new URL(origin);
       const granted = await chrome.permissions.request({ origins: [`${parsed.protocol}//${parsed.hostname}/*`] });
       if (!granted) throw new Error('未获得 DayMark 站点访问权限，设置尚未保存。');
     }
-    const next = { theme: document.querySelector('input[name="theme"]:checked').value, engine: $('engine').value, daymarkUrl: origin, links, demo, showNews: $('show-news').checked };
+    const next = { theme: document.querySelector('input[name="theme"]:checked').value, engine: $('engine').value, pomodoroMinutes, daymarkUrl: origin, links, demo, showNews: $('show-news').checked };
     if (extension) { await themeSave; await chrome.storage.local.set({ settings: next, theme: next.theme }); }
     else localStorage.setItem('daymark-start-settings', JSON.stringify(next));
     settings = next; revision++; applyTheme(settings.theme, true); $('settings').close(); renderLinks();
@@ -199,7 +203,7 @@ $('search').addEventListener('submit', event => {
 });
 $('query').addEventListener('input', () => $('query').setCustomValidity(''));
 document.addEventListener('keydown', event => {
-  if (event.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName) && !$('settings').open) { event.preventDefault(); $('query').focus(); }
+  if (event.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName) && !$('settings').open && !$('pomodoro').open) { event.preventDefault(); $('query').focus(); }
 });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { updateClock(); readDaymark(); readNews(); } });
 async function initialize() {
@@ -208,9 +212,12 @@ async function initialize() {
     settings = { ...defaults, ...stored.settings, theme: stored.theme || stored.settings?.theme || defaults.theme };
   } catch { settings = { ...defaults }; }
   if (!themes.includes(settings.theme)) settings.theme = defaults.theme;
+  try { settings.pomodoroMinutes = parseDuration(settings.pomodoroMinutes); }
+  catch { settings.pomodoroMinutes = defaults.pomodoroMinutes; }
   applyTheme(settings.theme, true);
   if (!extension && new URLSearchParams(location.search).has('demo')) settings.demo = true;
-  renderLinks(); updateClock(); await Promise.all([readDaymark(), readNews()]);
+  renderLinks(); updateClock(); setupPomodoro(() => settings.pomodoroMinutes);
+  await Promise.all([readDaymark(), readNews()]);
   setInterval(updateClock, 1000);
   setInterval(() => { if (!document.hidden) readDaymark(); }, 60000);
   setInterval(readNews, 300000);
